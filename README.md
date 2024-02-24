@@ -13,7 +13,9 @@ npm install
 ```
 npm i -g @nestjs/cli
 ```
-4. Levantar base de datos
+4. Clonar el archivo ```.env.template``` y renombrar la copia a ```.env```
+
+5. Levantar base de datos
 ```
 docker-compose up -d
 ```
