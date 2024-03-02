@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { validate as isUUID } from 'uuid';
 
 import { Product } from './entities/product.entity';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Injectable()
 export class ProductsService {
@@ -15,7 +17,7 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>
   ) {} 
 
-  async create(createProductDto: CreateProductDto) {
+  async create( createProductDto: CreateProductDto ) {
     try {
       const product = await this.productRepository.create( createProductDto );
       await this.productRepository.save( product );
@@ -26,20 +28,41 @@ export class ProductsService {
     }
   }
 
-  findAll() {
-    return `This action returns all products`;
+  async findAll( paginationDto: PaginationDto ) {
+    const { limit = 10, offset = 0 } = paginationDto;
+
+    return await this.productRepository.find({
+      take: limit,
+      skip: offset
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne( term: string ) {
+    let product: Product;
+    
+    if ( isUUID( term ) ) {
+      product = await this.productRepository.findOneBy({ id: term });
+    } else {
+      product = await this.productRepository.findOneBy({ slug: term });
+    }
+
+    if ( !product ) {
+      throw new  NotFoundException(`Product whit id ${ term } not found`);
+    }
+    return product;
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
     return `This action updates a #${id} product`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove( id: string ) {
+    const { affected } = await this.productRepository.delete( id );
+    if ( affected === 0) {
+      throw new BadRequestException(`Product whit id "${ id }" not found`)
+    }
+     
+    return;
   }
 
   private handleDBExceptions( error: any ) {
