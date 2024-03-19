@@ -19,3 +19,10 @@ npm i -g @nestjs/cli
 ```
 docker-compose up -d
 ```
+
+6. Levantar app: ```npm run start:dev```
+
+7. Ejecutar SEED
+```
+http://localhost:3000/api/seed
+```
