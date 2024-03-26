@@ -11,7 +11,7 @@ import { ConfigModule } from '@nestjs/config';
   providers: [AuthService],
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([ User ])
+    TypeOrmModule.forFeature([ User ]),
   ],
   exports: [TypeOrmModule]
 })
