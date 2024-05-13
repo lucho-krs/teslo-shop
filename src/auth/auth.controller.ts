@@ -8,6 +8,7 @@ import { RawHeaders } from './decorators/raw-header.decorator';
 import { UserRoleGuard } from './guards/user-role/user-role.guard';
 import { RoleProtected } from './decorators/role-protected.decorator';
 import { ValidRoles } from './interfaces';
+import { Auth } from './decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -53,8 +54,7 @@ export class AuthController {
   }
 
   @Get('private3')
-  @RoleProtected( ValidRoles.admin )
-  @UseGuards( AuthGuard(), UserRoleGuard )
+  @Auth( ValidRoles.admin )
   privateRoute3(
     @GetUser() user: User,
   ) {
