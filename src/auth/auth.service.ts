@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -27,10 +27,7 @@ export class AuthService {
       });
       await this.userRepository.save( user );
       delete user.password;
-
-      console.log({ user });
-      
-
+    
       return {
         ...user,
         token: this.getJwtToken({ id: user.id })
@@ -60,6 +57,13 @@ export class AuthService {
       ...user,
       token: this.getJwtToken({ id: user.id })
     };
+  }
+
+  async checkAuthStatus( user: User ) {
+    return {
+      ...user,
+      token: this.getJwtToken({ id: user.id })
+    }
   }
 
   private getJwtToken( payload: JwtPayload ) {
